@@ -1,0 +1,37 @@
+url <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
+download.file(url,destfile="~/work/coursera/GCDCourseProject/data.zip")
+unzip("data.zip")
+features <- read.table("UCI HAR Dataset/features.txt",col.names=c("num","functions"))
+act.labels <- read.table("UCI HAR Dataset/activity_labels.txt",col.names=c("num","action"))
+sub.test <- read.table("UCI HAR Dataset/test/subject_test.txt", col.names="subject")
+x.test <- read.table("UCI HAR Dataset/test/X_test.txt", col.names=features$functions)
+y.test <- read.table("UCI HAR Dataset/test/Y_test.txt", col.names="code")
+sub.train <- read.table("UCI HAR Dataset/train/subject_train.txt",col.names="subject")
+x.train <- read.table("UCI HAR Dataset/train/X_train.txt", col.names=features$functions)
+y.train <- read.table("UCI HAR Dataset/train/Y_train.txt", col.names="code")
+
+x <- rbind(x.train,x.test)
+y <- rbind(y.train,y.test)
+subject <- rbind(sub.train,sub.test)
+finaldata <- cbind(subject,x,y)
+
+library(dplyr)
+df <- finaldata %>% select(subject, code, contains("mean"), contains("std"))
+df$code <- act.labels[df$code, 2]
+names(df)[2] <- "action"
+names(df) <- gsub("Acc","Accelerometer",names(df))
+names(df) <- gsub("Gyro","Gyroscope",names(df))
+names(df) <- gsub("BodyBody","Body",names(df))
+names(df) <- gsub("Mag","Magnitude",names(df))
+names(df) <- gsub("^t","Time",names(df))
+names(df) <- gsub("^f","Frequency",names(df))
+names(df) <- gsub("tBody","TimeBody",names(df))
+names(df) <- gsub("-mean()","Mean",names(df),ignore.case=T)
+names(df) <- gsub("-std()","STD",names(df),ignore.case=T)
+names(df) <- gsub("-freq()","Frequency",names(df),ignore.case=T)
+names(df) <- gsub("angle","Angle",names(df))
+names(df) <- gsub("gravity","Gravity",names(df))
+
+df2 <- df %>% group_by(subject,action) %>% summarise_all(funs(mean))
+write.table(df2,"Output.txt",row.name=F)
+View(df2)
