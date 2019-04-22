@@ -7,6 +7,7 @@ LINK TO DATASET:
 https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip
 
 FILES:
+
 run_analysis.R
 The run_analysis.R is a script that processes the data downloaded from Samsung. When run, it creates the file Output.txt. Refer to "Code Book.md" for details regarding the code.
 
